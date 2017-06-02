@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Gabriel <g2p.code@gmail.com>"]
 
 [dependencies]
+clap = "2"
+
