@@ -155,6 +155,7 @@ lazy_static! {
         },
         ArchiveType {
             extensions: vec![
+                ".part1.rar",
                 ".rar",
             ],
             extract_cmd: vec!["unrar", "x", "--"],
