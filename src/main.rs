@@ -1,5 +1,8 @@
 #[macro_use]
 extern crate clap;
+#[macro_use]
+extern crate lazy_static;
+
 extern crate scmp;
 
 use std::process::Command;
@@ -58,41 +61,66 @@ fn setup_seccomp() -> Result<(), std::io::Error> {
 }
 
 
+struct ArchiveType {
+    extensions: Vec<&'static str>,
+    extract_cmd: Vec<&'static str>,
+}
+
+lazy_static! {
+    static ref ARCHIVE_TYPES : Vec<ArchiveType> = vec![
+        ArchiveType {
+            extensions: vec![
+                ".tgz",
+                ".tar.gz",
+                ".tar.Z",
+                ".tbz2",
+                ".tar.bz2",
+                ".tlz",
+                ".tar.lz",
+                ".tar.lzma",
+                ".tar.lzo",
+                ".tar.xz",
+            ],
+            extract_cmd: vec!["tar", "-xf"],
+        },
+        ArchiveType {
+            extensions: vec![
+                ".zip",
+            ],
+            extract_cmd: vec!["unzip", "--"],
+        },
+    ];
+}
+
+
 fn main() {
     let matches = clap_app!(myapp =>
         (@arg ARCHIVE: +required ... "Archives to extract")
     ).get_matches();
 
+    let mut found = false;
+
     for arch in matches.values_of("ARCHIVE").unwrap() {
         println!("Extract {}", arch);
-        if
-            arch.ends_with(".tgz")
-            || arch.ends_with(".tar.gz")
-            || arch.ends_with(".tar.Z")
-            || arch.ends_with(".tbz2")
-            || arch.ends_with(".tar.bz2")
-            || arch.ends_with(".tlz")
-            || arch.ends_with(".tar.lz")
-            || arch.ends_with(".tar.lzma")
-            || arch.ends_with(".tar.lzo")
-            || arch.ends_with(".tar.xz")
-        {
-            let status = Command::new("tar")
-                .arg("-xf")
-                .arg(arch)
-                .before_exec(setup_seccomp)
-                .status()
-                .expect("Failed to launch tar");
-            assert!(status.success(), "tar wasn't successful");
-        } else if arch.ends_with(".zip") {
-            let status = Command::new("unzip")
-                .arg("--")
-                .arg(arch)
-                .before_exec(setup_seccomp)
-                .status()
-                .expect("Failed to launch unzip");
-            assert!(status.success(), "unzip wasn't successful");
-        } else {
+        for at in ARCHIVE_TYPES.iter() {
+            for &ext in &at.extensions {
+                if !arch.ends_with(ext) {
+                    continue;
+                }
+                let stripped = &arch[..arch.len()-ext.len()];
+                let cmd = at.extract_cmd[0];
+                let status = Command::new(cmd)
+                    .args(&at.extract_cmd[1..])
+                    .arg(arch)
+                    .before_exec(setup_seccomp)
+                    .status()
+                    .expect(format!("Failed to launch {}", cmd).as_str());
+                assert!(status.success(), format!("{} wasn't successful", cmd));
+                found = true;
+                break;
+            }
+        }
+        if !found {
             println!("Can't handle {}", arch);
         }
     }

@@ -6,4 +6,5 @@ authors = ["Gabriel <g2p.code@gmail.com>"]
 [dependencies]
 clap = "2"
 scmp = "0.1"
+lazy_static = "0.2"
 
