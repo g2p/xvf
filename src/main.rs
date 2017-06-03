@@ -79,9 +79,13 @@ fn setup_seccomp() -> Result<(), Error> {
 
 const RENAME_NOREPLACE : u64 = 1;
 
+fn path_to_cstring(path : &Path) -> CString {
+    return CString::new(path.as_os_str().as_bytes()).unwrap();
+}
+
 fn rename_noreplace(path0 : &Path, path1 : &Path) -> Result<(), Error> {
     unsafe {
-        if libc::syscall(__NR_renameat2 as i64, libc::AT_FDCWD, CString::new(path0.as_os_str().as_bytes()).unwrap().as_ptr(), libc::AT_FDCWD, CString::new(path1.as_os_str().as_bytes()).unwrap().as_ptr(), RENAME_NOREPLACE, 0) == 0 {
+        if libc::syscall(__NR_renameat2 as i64, libc::AT_FDCWD, path_to_cstring(path0).as_ptr(), libc::AT_FDCWD, path_to_cstring(path1).as_ptr(), RENAME_NOREPLACE, 0) == 0 {
             return Ok(());
         } else {
             return Err(Error::last_os_error());
