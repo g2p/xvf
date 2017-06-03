@@ -48,6 +48,10 @@ fn setup_seccomp() -> Result<(), std::io::Error> {
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_openat as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_unlinkat as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_utimensat as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_lstat as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_fchmod as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_unlink as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_utime as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_load(ctx0) == 0);
     }
     return Ok(());
@@ -80,6 +84,14 @@ fn main() {
                 .status()
                 .expect("Failed to launch tar");
             assert!(status.success(), "tar wasn't successful");
+        } else if arch.ends_with(".zip") {
+            let status = Command::new("unzip")
+                .arg("--")
+                .arg(arch)
+                .before_exec(setup_seccomp)
+                .status()
+                .expect("Failed to launch unzip");
+            assert!(status.success(), "unzip wasn't successful");
         } else {
             println!("Can't handle {}", arch);
         }
