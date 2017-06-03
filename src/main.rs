@@ -4,6 +4,7 @@ extern crate clap;
 extern crate lazy_static;
 
 extern crate scmp;
+extern crate tempdir;
 
 use std::process::Command;
 use std::os::unix::process::CommandExt;
@@ -107,16 +108,19 @@ fn main() {
                 if !arch.ends_with(ext) {
                     continue;
                 }
+                found = true;
+
                 let stripped = &arch[..arch.len()-ext.len()];
                 let cmd = at.extract_cmd[0];
+                let tmpdir = tempdir::TempDir::new_in(".", (stripped.to_owned() + ".").as_str()).expect("Unable to create temporary directory");
                 let status = Command::new(cmd)
                     .args(&at.extract_cmd[1..])
                     .arg(arch)
+                    .current_dir(tmpdir)
                     .before_exec(setup_seccomp)
                     .status()
                     .expect(format!("Failed to launch {}", cmd).as_str());
                 assert!(status.success(), format!("{} wasn't successful", cmd));
-                found = true;
                 break;
             }
         }
@@ -125,3 +129,4 @@ fn main() {
         }
     }
 }
+
