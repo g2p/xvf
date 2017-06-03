@@ -72,6 +72,13 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx0, __NR_utime);
         allow_syscall(ctx0, __NR_futex);
         allow_syscall(ctx0, __NR_chmod);
+        allow_syscall(ctx0, __NR_getuid);
+        allow_syscall(ctx0, __NR_getgid);
+        allow_syscall(ctx0, __NR_getppid);
+        allow_syscall(ctx0, __NR_getcwd);
+        allow_syscall(ctx0, __NR_getegid);
+        allow_syscall(ctx0, __NR_getdents);
+        allow_syscall(ctx0, __NR_readlink);
         assert!(seccomp_load(ctx0) == 0);
     }
     return Ok(());
@@ -151,6 +158,12 @@ lazy_static! {
                 ".rar",
             ],
             extract_cmd: vec!["unrar", "x", "--"],
+        },
+        ArchiveType {
+            extensions: vec![
+                ".7z",
+            ],
+            extract_cmd: vec!["7z", "x", "--"],
         },
     ];
 }
