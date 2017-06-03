@@ -5,4 +5,5 @@ authors = ["Gabriel <g2p.code@gmail.com>"]
 
 [dependencies]
 clap = "2"
+seccomp = "0.1"
 

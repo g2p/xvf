@@ -1,7 +1,18 @@
 #[macro_use]
 extern crate clap;
+extern crate seccomp;
 
 use std::process::Command;
+use std::os::unix::process::CommandExt;
+
+fn setup_seccomp() -> Result<(), std::io::Error> {
+    let mut ctx = seccomp::Context::default(seccomp::Action::Trap).unwrap();
+    ctx.add_rule(
+        seccomp::Rule::new(59, seccomp::Action::Allow)
+        ).unwrap();
+    ctx.load().unwrap();
+    return Ok(());
+}
 
 
 fn main() {
@@ -26,6 +37,7 @@ fn main() {
             let status = Command::new("tar")
                 .arg("-xf")
                 .arg(arch)
+                .before_exec(setup_seccomp)
                 .status()
                 .expect("Failed to launch tar");
             assert!(status.success(), "tar wasn't successful");
