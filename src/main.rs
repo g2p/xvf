@@ -65,6 +65,8 @@ fn setup_seccomp() -> Result<(), Error> {
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_fchmod as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_unlink as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_utime as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_futex as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_chmod as i32, 0, std::ptr::null()) == 0);
         assert!(seccomp_load(ctx0) == 0);
     }
     return Ok(());
@@ -134,6 +136,12 @@ lazy_static! {
                 ".zip",
             ],
             extract_cmd: vec!["unzip", "--"],
+        },
+        ArchiveType {
+            extensions: vec![
+                ".rar",
+            ],
+            extract_cmd: vec!["unrar", "x", "--"],
         },
     ];
 }
