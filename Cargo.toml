@@ -2,8 +2,12 @@
 name = "xvf"
 version = "0.1.0"
 authors = ["Gabriel <g2p.code@gmail.com>"]
+build = "build.rs"
 
 [dependencies]
 clap = "2"
 seccomp = "0.1"
+
+[build-dependencies]
+bindgen = "0"
 

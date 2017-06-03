@@ -1,16 +1,22 @@
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+
 #[macro_use]
 extern crate clap;
-extern crate seccomp;
 
 use std::process::Command;
 use std::os::unix::process::CommandExt;
 
 fn setup_seccomp() -> Result<(), std::io::Error> {
-    let mut ctx = seccomp::Context::default(seccomp::Action::Trap).unwrap();
-    ctx.add_rule(
-        seccomp::Rule::new(59, seccomp::Action::Allow)
-        ).unwrap();
-    ctx.load().unwrap();
+    unsafe {
+        let ctx0 = seccomp_init(SCMP_ACT_TRAP);
+        assert!(!ctx0.is_null());
+        assert!(seccomp_rule_add_array(ctx0, SCMP_ACT_ALLOW, __NR_execve as i32, 0, std::ptr::null()) == 0);
+        assert!(seccomp_load(ctx0) == 0);
+    }
     return Ok(());
 }
 
