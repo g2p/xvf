@@ -8,3 +8,4 @@ It uses seccomp to sandbox the extraction programs.
 
 Similar tools:
 dtrx patool atool unp (perl, python)
+
