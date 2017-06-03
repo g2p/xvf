@@ -1,11 +1,11 @@
 [package]
 name = "xvf"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Gabriel de Perthuis <g2p.code@gmail.com>"]
 description = "Easy archive extraction"
 license = "ISC"
-repository = "https://github.com/g2p/xvd"
-homepage = "https://github.com/g2p/xvd#readme"
+repository = "https://github.com/g2p/xvf"
+homepage = "https://github.com/g2p/xvf#readme"
 
 [dependencies]
 clap = "2"
