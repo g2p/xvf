@@ -189,9 +189,11 @@ fn main() {
                     let path = path.expect("Unable to iterate the extraction directory");
                     if let Some(path1) = dir_list.next() {
                         path1.expect("Unable to iterate the extraction directory");
-                        rename_or_suffix(&extracted_path, Path::new(stripped)).expect("Failed to rename");
+                        let newname = rename_or_suffix(&extracted_path, Path::new(stripped)).expect("Failed to rename");
+                        println!("Extracted to {:?}", newname);
                     } else {
-                        rename_or_suffix(&path.path(), Path::new(stripped)).expect("Failed to rename");
+                        let newname = rename_or_suffix(&path.path(), Path::new(stripped)).expect("Failed to rename");
+                        println!("Extracted to {:?}", newname);
                         fs::remove_dir(&extracted_path).expect("Failed to remove empty extraction directory");
                     }
                 } else {
