@@ -8,4 +8,5 @@ clap = "2"
 scmp = "0.1"
 lazy_static = "0.2"
 tempdir = "0.3"
+libc = "0.2"
 
