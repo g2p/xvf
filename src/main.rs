@@ -179,15 +179,17 @@ fn main() {
 
     for arch in matches.values_of_os("ARCHIVE").unwrap() {
         let arch = Path::new(arch);
+        let arch_bytes = arch.as_os_str().as_bytes();
         println!("Extract {:?}", arch);
         for at in ARCHIVE_TYPES.iter() {
             for &ext in &at.extensions {
-                if !arch.as_os_str().as_bytes().ends_with(ext.as_bytes()) {
+                let ext_bytes = ext.as_bytes();
+                if !arch_bytes.ends_with(ext_bytes) {
                     continue;
                 }
                 found = true;
 
-                let noext : &OsStr = OsStrExt::from_bytes(&arch.as_os_str().as_bytes()[0..arch.as_os_str().as_bytes().len()-ext.as_bytes().len()]);
+                let noext : &OsStr = OsStrExt::from_bytes(&arch_bytes[0..arch_bytes.len()-ext_bytes.len()]);
                 let stripped =
                     if let Some(noext) = Path::new(noext).file_name() {
                         noext
