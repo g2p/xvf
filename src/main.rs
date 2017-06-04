@@ -79,6 +79,8 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx0, __NR_getegid);
         allow_syscall(ctx0, __NR_getdents);
         allow_syscall(ctx0, __NR_readlink);
+        allow_syscall(ctx0, __NR_mkdirat);
+        allow_syscall(ctx0, __NR_mkdir);
         assert!(seccomp_load(ctx0) == 0);
     }
     return Ok(());
