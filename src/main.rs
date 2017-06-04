@@ -82,6 +82,7 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx0, __NR_mkdirat);
         allow_syscall(ctx0, __NR_mkdir);
         allow_syscall(ctx0, __NR_madvise);
+        allow_syscall(ctx0, __NR_exit);
         assert!(seccomp_load(ctx0) == 0);
     }
     return Ok(());
