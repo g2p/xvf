@@ -26,64 +26,75 @@ unsafe fn allow_syscall(ctx : *mut c_void, nr : u32) {
 
 fn setup_seccomp() -> Result<(), Error> {
     unsafe {
-        let ctx0 = seccomp_init(SCMP_ACT_TRAP);
-        assert!(!ctx0.is_null());
-        allow_syscall(ctx0, __NR_execve);
-        allow_syscall(ctx0, __NR_brk);
-        allow_syscall(ctx0, __NR_access);
-        allow_syscall(ctx0, __NR_mmap);
-        allow_syscall(ctx0, __NR_open);
-        allow_syscall(ctx0, __NR_read);
-        allow_syscall(ctx0, __NR_write);
-        allow_syscall(ctx0, __NR_stat);
-        allow_syscall(ctx0, __NR_fstat);
-        allow_syscall(ctx0, __NR_close);
-        allow_syscall(ctx0, __NR_mprotect);
-        allow_syscall(ctx0, __NR_arch_prctl);
-        allow_syscall(ctx0, __NR_munmap);
-        allow_syscall(ctx0, __NR_set_tid_address);
-        allow_syscall(ctx0, __NR_set_robust_list);
-        allow_syscall(ctx0, __NR_rt_sigaction);
-        allow_syscall(ctx0, __NR_rt_sigprocmask);
-        allow_syscall(ctx0, __NR_getrlimit);
-        allow_syscall(ctx0, __NR_statfs);
-        allow_syscall(ctx0, __NR_fcntl);
-        allow_syscall(ctx0, __NR_geteuid);
-        allow_syscall(ctx0, __NR_umask);
-        allow_syscall(ctx0, __NR_pipe);
-        allow_syscall(ctx0, __NR_clone);
-        allow_syscall(ctx0, __NR_wait4);
-        allow_syscall(ctx0, __NR_exit_group);
-        allow_syscall(ctx0, __NR_dup);
-        allow_syscall(ctx0, __NR_ioctl);
-        allow_syscall(ctx0, __NR_getpid);
-        allow_syscall(ctx0, __NR_gettid);
-        allow_syscall(ctx0, __NR_tgkill);
-        allow_syscall(ctx0, __NR_rt_sigreturn);
-        allow_syscall(ctx0, __NR_socket);
-        allow_syscall(ctx0, __NR_connect);
-        allow_syscall(ctx0, __NR_lseek);
-        allow_syscall(ctx0, __NR_openat);
-        allow_syscall(ctx0, __NR_unlinkat);
-        allow_syscall(ctx0, __NR_utimensat);
-        allow_syscall(ctx0, __NR_lstat);
-        allow_syscall(ctx0, __NR_fchmod);
-        allow_syscall(ctx0, __NR_unlink);
-        allow_syscall(ctx0, __NR_utime);
-        allow_syscall(ctx0, __NR_futex);
-        allow_syscall(ctx0, __NR_chmod);
-        allow_syscall(ctx0, __NR_getuid);
-        allow_syscall(ctx0, __NR_getgid);
-        allow_syscall(ctx0, __NR_getppid);
-        allow_syscall(ctx0, __NR_getcwd);
-        allow_syscall(ctx0, __NR_getegid);
-        allow_syscall(ctx0, __NR_getdents);
-        allow_syscall(ctx0, __NR_readlink);
-        allow_syscall(ctx0, __NR_mkdirat);
-        allow_syscall(ctx0, __NR_mkdir);
-        allow_syscall(ctx0, __NR_madvise);
-        allow_syscall(ctx0, __NR_exit);
-        assert!(seccomp_load(ctx0) == 0);
+        let ctx = seccomp_init(SCMP_ACT_TRAP);
+        assert!(!ctx.is_null());
+        allow_syscall(ctx, __NR_execve);
+        allow_syscall(ctx, __NR_brk);
+        allow_syscall(ctx, __NR_access);
+        allow_syscall(ctx, __NR_mmap);
+        allow_syscall(ctx, __NR_open);
+        allow_syscall(ctx, __NR_read);
+        allow_syscall(ctx, __NR_write);
+        allow_syscall(ctx, __NR_stat);
+        allow_syscall(ctx, __NR_fstat);
+        allow_syscall(ctx, __NR_close);
+        allow_syscall(ctx, __NR_mprotect);
+        allow_syscall(ctx, __NR_arch_prctl);
+        allow_syscall(ctx, __NR_munmap);
+        allow_syscall(ctx, __NR_set_tid_address);
+        allow_syscall(ctx, __NR_set_robust_list);
+        allow_syscall(ctx, __NR_rt_sigaction);
+        allow_syscall(ctx, __NR_rt_sigprocmask);
+        allow_syscall(ctx, __NR_getrlimit);
+        allow_syscall(ctx, __NR_statfs);
+        allow_syscall(ctx, __NR_fcntl);
+        allow_syscall(ctx, __NR_geteuid);
+        allow_syscall(ctx, __NR_umask);
+        allow_syscall(ctx, __NR_pipe);
+        allow_syscall(ctx, __NR_clone);
+        allow_syscall(ctx, __NR_wait4);
+        allow_syscall(ctx, __NR_exit_group);
+        allow_syscall(ctx, __NR_dup);
+        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIOCLEX, datum_b: 0,
+        }) == 0);
+        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIONBIO, datum_b: 0,
+        }) == 0);
+        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TCGETS, datum_b: 0,
+        }) == 0);
+        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TIOCGWINSZ, datum_b: 0,
+        }) == 0);
+        allow_syscall(ctx, __NR_getpid);
+        allow_syscall(ctx, __NR_gettid);
+        allow_syscall(ctx, __NR_tgkill);
+        allow_syscall(ctx, __NR_rt_sigreturn);
+        allow_syscall(ctx, __NR_socket);
+        allow_syscall(ctx, __NR_connect);
+        allow_syscall(ctx, __NR_lseek);
+        allow_syscall(ctx, __NR_openat);
+        allow_syscall(ctx, __NR_unlinkat);
+        allow_syscall(ctx, __NR_utimensat);
+        allow_syscall(ctx, __NR_lstat);
+        allow_syscall(ctx, __NR_fchmod);
+        allow_syscall(ctx, __NR_unlink);
+        allow_syscall(ctx, __NR_utime);
+        allow_syscall(ctx, __NR_futex);
+        allow_syscall(ctx, __NR_chmod);
+        allow_syscall(ctx, __NR_getuid);
+        allow_syscall(ctx, __NR_getgid);
+        allow_syscall(ctx, __NR_getppid);
+        allow_syscall(ctx, __NR_getcwd);
+        allow_syscall(ctx, __NR_getegid);
+        allow_syscall(ctx, __NR_getdents);
+        allow_syscall(ctx, __NR_readlink);
+        allow_syscall(ctx, __NR_mkdirat);
+        allow_syscall(ctx, __NR_mkdir);
+        allow_syscall(ctx, __NR_madvise);
+        allow_syscall(ctx, __NR_exit);
+        assert!(seccomp_load(ctx) == 0);
     }
     return Ok(());
 }
