@@ -204,7 +204,7 @@ fn main() {
                     stripped.to_string_lossy().to_mut().as_str()).expect("Unable to create temporary directory");
                 let status = Command::new(cmd)
                     .args(&at.extract_cmd[1..])
-                    .arg(&arch)
+                    .arg(fs::canonicalize(&arch).expect("Unable to find archive"))
                     .current_dir(&tmpdir)
                     .before_exec(setup_seccomp)
                     .status()
