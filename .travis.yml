@@ -4,8 +4,9 @@ sudo: required
 
 before_install:
   - sudo apt update
-  - sudo apt install libseccomp-dev unrar unzip p7zip-full
+  - sudo apt install libseccomp-dev unrar unzip p7zip-full strace
 
 script:
-  - cargo run tests/sample.{rar,tgz,zip,7z}
+  - cargo build
+  - strace -f cargo run tests/sample.{rar,tgz,zip,7z}
 
