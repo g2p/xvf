@@ -4,7 +4,7 @@ sudo: required
 
 before_install:
   - sudo apt update
-  - sudo apt install unrar unzip p7zip-full
+  - sudo apt install libseccomp-dev unrar unzip p7zip-full
 
 script:
   - cargo run tests/sample.{rar,tgz,zip,7z}
