@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "cargo-clippy", allow(needless_return))]
+
 #[macro_use]
 extern crate clap;
 #[macro_use]
@@ -21,7 +23,7 @@ use std::process::Command;
 use scmp::*;
 
 unsafe fn allow_syscall(ctx : *mut c_void, nr : u32) {
-    assert!(seccomp_rule_add_array(ctx, SCMP_ACT_ALLOW, nr as i32, 0, std::ptr::null()) == 0);
+    assert_eq!(seccomp_rule_add_array(ctx, SCMP_ACT_ALLOW, nr as i32, 0, std::ptr::null()), 0);
 }
 
 fn setup_seccomp() -> Result<(), Error> {
@@ -55,18 +57,18 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_wait4);
         allow_syscall(ctx, __NR_exit_group);
         allow_syscall(ctx, __NR_dup);
-        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+        assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
             arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIOCLEX, datum_b: 0,
-        }) == 0);
-        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+        }), 0);
+        assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
             arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIONBIO, datum_b: 0,
-        }) == 0);
-        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+        }), 0);
+        assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
             arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TCGETS, datum_b: 0,
-        }) == 0);
-        assert!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
+        }), 0);
+        assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
             arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TIOCGWINSZ, datum_b: 0,
-        }) == 0);
+        }), 0);
         allow_syscall(ctx, __NR_getpid);
         allow_syscall(ctx, __NR_gettid);
         allow_syscall(ctx, __NR_tgkill);
@@ -94,7 +96,7 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_mkdir);
         allow_syscall(ctx, __NR_madvise);
         allow_syscall(ctx, __NR_exit);
-        assert!(seccomp_load(ctx) == 0);
+        assert_eq!(seccomp_load(ctx), 0);
     }
     return Ok(());
 }
