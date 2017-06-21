@@ -75,6 +75,9 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_rt_sigreturn);
         allow_syscall(ctx, __NR_socket);
         allow_syscall(ctx, __NR_connect);
+        allow_syscall(ctx, __NR_sendto);
+        allow_syscall(ctx, __NR_poll);
+        allow_syscall(ctx, __NR_recvmsg);
         allow_syscall(ctx, __NR_lseek);
         allow_syscall(ctx, __NR_openat);
         allow_syscall(ctx, __NR_unlinkat);
