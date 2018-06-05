@@ -48,6 +48,10 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_rt_sigaction);
         allow_syscall(ctx, __NR_rt_sigprocmask);
         allow_syscall(ctx, __NR_getrlimit);
+        allow_syscall(ctx, __NR_prlimit64);
+        allow_syscall(ctx, __NR_gettimeofday);
+        allow_syscall(ctx, __NR_clock_gettime);
+        allow_syscall(ctx, __NR_recvmsg);
         allow_syscall(ctx, __NR_statfs);
         allow_syscall(ctx, __NR_fcntl);
         allow_syscall(ctx, __NR_geteuid);
@@ -58,16 +62,16 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_exit_group);
         allow_syscall(ctx, __NR_dup);
         assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
-            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIOCLEX, datum_b: 0,
+            arg: 1, op: scmp_compare_SCMP_CMP_EQ, datum_a: libc::FIOCLEX, datum_b: 0,
         }), 0);
         assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
-            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::FIONBIO, datum_b: 0,
+            arg: 1, op: scmp_compare_SCMP_CMP_EQ, datum_a: libc::FIONBIO, datum_b: 0,
         }), 0);
         assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
-            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TCGETS, datum_b: 0,
+            arg: 1, op: scmp_compare_SCMP_CMP_EQ, datum_a: libc::TCGETS, datum_b: 0,
         }), 0);
         assert_eq!(seccomp_rule_add(ctx, SCMP_ACT_ALLOW, __NR_ioctl as i32, 1, scmp_arg_cmp {
-            arg: 1, op: scmp_compare::SCMP_CMP_EQ, datum_a: libc::TIOCGWINSZ, datum_b: 0,
+            arg: 1, op: scmp_compare_SCMP_CMP_EQ, datum_a: libc::TIOCGWINSZ, datum_b: 0,
         }), 0);
         allow_syscall(ctx, __NR_getpid);
         allow_syscall(ctx, __NR_gettid);
@@ -77,7 +81,6 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_connect);
         allow_syscall(ctx, __NR_sendto);
         allow_syscall(ctx, __NR_poll);
-        allow_syscall(ctx, __NR_recvmsg);
         allow_syscall(ctx, __NR_lseek);
         allow_syscall(ctx, __NR_openat);
         allow_syscall(ctx, __NR_unlinkat);

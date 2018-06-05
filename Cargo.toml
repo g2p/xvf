@@ -10,7 +10,7 @@ homepage = "https://github.com/g2p/xvf#readme"
 [dependencies]
 clap = "2"
 scmp = "0.1"
-lazy_static = "0.2"
+lazy_static = "1"
 tempdir = "0.3"
 libc = "0.2"
 
