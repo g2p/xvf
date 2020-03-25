@@ -1,5 +1,3 @@
-#![cfg_attr(feature = "cargo-clippy", allow(needless_return))]
-
 #[macro_use]
 extern crate clap;
 #[macro_use]
@@ -104,21 +102,21 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_exit);
         assert_eq!(seccomp_load(ctx), 0);
     }
-    return Ok(());
+    Ok(())
 }
 
 const RENAME_NOREPLACE : u64 = 1;
 
 fn path_to_cstring(path : &Path) -> CString {
-    return CString::new(path.as_os_str().as_bytes()).unwrap();
+    CString::new(path.as_os_str().as_bytes()).unwrap()
 }
 
 fn rename_noreplace(path0 : &Path, path1 : &Path) -> Result<(), Error> {
     unsafe {
         if libc::syscall(__NR_renameat2 as i64, libc::AT_FDCWD, path_to_cstring(path0).as_ptr(), libc::AT_FDCWD, path_to_cstring(path1).as_ptr(), RENAME_NOREPLACE, 0) == 0 {
-            return Ok(());
+            Ok(())
         } else {
-            return Err(Error::last_os_error());
+            Err(Error::last_os_error())
         }
     }
 }
@@ -141,9 +139,9 @@ fn rename_or_suffix(path0 : &Path, path1 : &Path) -> Result<PathBuf, Error> {
             }
             return Ok(Path::new(&builder).to_path_buf());
         }
-        return Ok(PathBuf::new()); // XXX Unreachable
+        Ok(PathBuf::new()) // XXX Unreachable
     } else {
-        return Ok(path1.to_path_buf());
+        Ok(path1.to_path_buf())
     }
 }
 
@@ -223,13 +221,13 @@ fn main() {
                 let tmpdir = tempdir::TempDir::new_in(
                     env::current_dir().expect("Unable to get the current directory"),
                     stripped.to_string_lossy().to_mut().as_str()).expect("Unable to create temporary directory");
-                let status = Command::new(cmd)
+                let status = unsafe { Command::new(cmd)
                     .args(&at.extract_cmd[1..])
                     .arg(fs::canonicalize(&arch).expect("Unable to find archive"))
                     .current_dir(&tmpdir)
-                    .before_exec(setup_seccomp)
+                    .pre_exec(setup_seccomp)
                     .status()
-                    .expect(format!("Failed to launch {}", cmd).as_str());
+                    .unwrap_or_else(|_| panic!("Failed to launch {}", cmd))};
                 assert!(status.success(), format!("{} wasn't successful", cmd));
                 let extracted_path = tmpdir.into_path();
                 let mut dir_list = fs::read_dir(&extracted_path).expect("Unable to read the extraction directory");
