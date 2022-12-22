@@ -6,9 +6,10 @@ description = "Easy archive extraction"
 license = "ISC"
 repository = "https://github.com/g2p/xvf"
 homepage = "https://github.com/g2p/xvf#readme"
+edition = "2021"
 
 [dependencies]
-bpaf = "0.4"
+bpaf = "0.7"
 scmp = "0.1"
 lazy_static = "1"
 tempfile = "3"

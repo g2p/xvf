@@ -1,12 +1,9 @@
-extern crate bpaf;
 #[macro_use]
 extern crate lazy_static;
 
-extern crate libc;
-extern crate scmp;
-extern crate tempfile;
-
+use bpaf::Parser;
 use scmp::*;
+
 use std::env;
 use std::ffi::CString;
 use std::ffi::OsStr;
@@ -243,16 +240,12 @@ lazy_static! {
 }
 
 fn main() {
-    let parser = bpaf::positional("ARCHIVE").some("At least one archive is required");
-    let archives = bpaf::Info::default()
-        .descr("Extract archives")
-        .for_parser(parser)
-        .run();
+    let parser = bpaf::positional::<PathBuf>("ARCHIVE").some("At least one archive is required");
+    let archives = parser.to_options().descr("Extract archives").run();
 
     let mut found = false;
 
     for arch in &archives {
-        let arch = Path::new(arch);
         let arch_bytes = arch.as_os_str().as_bytes();
         println!("Extract {:?}", arch);
         for at in ARCHIVE_TYPES.iter() {
