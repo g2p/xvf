@@ -33,6 +33,7 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_mmap);
         allow_syscall(ctx, __NR_open);
         allow_syscall(ctx, __NR_read);
+        allow_syscall(ctx, __NR_pread64);
         allow_syscall(ctx, __NR_write);
         allow_syscall(ctx, __NR_stat);
         allow_syscall(ctx, __NR_fstat);
@@ -148,6 +149,11 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_mkdir);
         allow_syscall(ctx, __NR_madvise);
         allow_syscall(ctx, __NR_exit);
+        allow_syscall(ctx, __NR_rseq);
+        allow_syscall(ctx, __NR_getrandom);
+        allow_syscall(ctx, __NR_pipe2);
+        allow_syscall(ctx, __NR_sysinfo);
+        allow_syscall(ctx, __NR_fadvise64);
         assert_eq!(seccomp_load(ctx), 0);
     }
     Ok(())
