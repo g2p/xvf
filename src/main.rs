@@ -60,6 +60,7 @@ fn setup_seccomp() -> Result<(), Error> {
         allow_syscall(ctx, __NR_wait4);
         allow_syscall(ctx, __NR_exit_group);
         allow_syscall(ctx, __NR_dup);
+        allow_syscall(ctx, __NR_dup2);
         assert_eq!(
             seccomp_rule_add(
                 ctx,
