@@ -1,6 +1,6 @@
 [package]
 name = "xvf"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Gabriel de Perthuis <g2p.code@gmail.com>"]
 description = "Easy archive extraction"
 license = "ISC"
