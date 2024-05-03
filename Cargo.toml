@@ -11,6 +11,6 @@ edition = "2021"
 [dependencies]
 bpaf = "0.9"
 scmp = "0.1.2"
-tempfile = "3"
+tempfile = "3.2"
 libc = "0.2"
 
