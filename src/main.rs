@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-
 use bpaf::Parser;
 use scmp::*;
 
@@ -15,6 +12,7 @@ use std::os::unix::process::CommandExt;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::OnceLock;
 
 unsafe fn allow_syscall(ctx: *mut c_void, nr: u32) {
     assert_eq!(
@@ -214,36 +212,39 @@ struct ArchiveType {
     extract_cmd: Vec<&'static str>,
 }
 
-lazy_static! {
-    static ref ARCHIVE_TYPES: Vec<ArchiveType> = vec![
-        ArchiveType {
-            extensions: vec![
-                ".tgz",
-                ".tar.gz",
-                ".tar.Z",
-                ".tbz2",
-                ".tar.bz2",
-                ".tlz",
-                ".tar.lz",
-                ".tar.lzma",
-                ".tar.lzo",
-                ".tar.xz",
-            ],
-            extract_cmd: vec!["tar", "-xf"],
-        },
-        ArchiveType {
-            extensions: vec![".zip",],
-            extract_cmd: vec!["unzip", "--"],
-        },
-        ArchiveType {
-            extensions: vec![".part1.rar", ".rar",],
-            extract_cmd: vec!["unrar", "x", "--"],
-        },
-        ArchiveType {
-            extensions: vec![".7z",],
-            extract_cmd: vec!["7z", "x", "--"],
-        },
-    ];
+fn archive_types() -> &'static Vec<ArchiveType> {
+    static ARCHIVE_TYPES: OnceLock<Vec<ArchiveType>> = OnceLock::new();
+    ARCHIVE_TYPES.get_or_init(|| {
+        vec![
+            ArchiveType {
+                extensions: vec![
+                    ".tgz",
+                    ".tar.gz",
+                    ".tar.Z",
+                    ".tbz2",
+                    ".tar.bz2",
+                    ".tlz",
+                    ".tar.lz",
+                    ".tar.lzma",
+                    ".tar.lzo",
+                    ".tar.xz",
+                ],
+                extract_cmd: vec!["tar", "-xf"],
+            },
+            ArchiveType {
+                extensions: vec![".zip"],
+                extract_cmd: vec!["unzip", "--"],
+            },
+            ArchiveType {
+                extensions: vec![".part1.rar", ".rar"],
+                extract_cmd: vec!["unrar", "x", "--"],
+            },
+            ArchiveType {
+                extensions: vec![".7z"],
+                extract_cmd: vec!["7z", "x", "--"],
+            },
+        ]
+    })
 }
 
 fn cli_parser() -> bpaf::OptionParser<Vec<PathBuf>> {
@@ -259,7 +260,7 @@ fn main() {
     for arch in &archives {
         let arch_bytes = arch.as_os_str().as_bytes();
         println!("Extract {:?}", arch);
-        for at in ARCHIVE_TYPES.iter() {
+        for at in archive_types().iter() {
             for &ext in &at.extensions {
                 let ext_bytes = ext.as_bytes();
                 if !arch_bytes.ends_with(ext_bytes) {
