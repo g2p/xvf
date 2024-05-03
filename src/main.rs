@@ -246,9 +246,13 @@ lazy_static! {
     ];
 }
 
+fn cli_parser() -> bpaf::OptionParser<Vec<PathBuf>> {
+    let archives = bpaf::positional::<PathBuf>("ARCHIVE").some("At least one archive is required");
+    archives.to_options().descr("Extract archives")
+}
+
 fn main() {
-    let parser = bpaf::positional::<PathBuf>("ARCHIVE").some("At least one archive is required");
-    let archives = parser.to_options().descr("Extract archives").run();
+    let archives = cli_parser().run();
 
     let mut found = false;
 
@@ -312,4 +316,9 @@ fn main() {
             println!("Can't handle {:?}", arch);
         }
     }
+}
+
+#[test]
+fn check_bpaf_invariants() {
+    cli_parser().check_invariants(false)
 }

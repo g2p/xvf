@@ -9,7 +9,7 @@ homepage = "https://github.com/g2p/xvf#readme"
 edition = "2021"
 
 [dependencies]
-bpaf = "0.7"
+bpaf = "0.9"
 scmp = "0.1.2"
 lazy_static = "1"
 tempfile = "3"
